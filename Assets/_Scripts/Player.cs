@@ -1,11 +1,14 @@
-
 using Unity.Netcode;
 using UnityEngine;
 
 namespace HelloWorld
 {
-    public class HelloWorldPlayer : NetworkBehaviour
+    public class Player : NetworkBehaviour
     {
+
+        public Color[] colores = {Color.black, Color.blue, Color.cyan, Color.green, Color.magenta, Color.red, Color.yellow, Color.gray, new Color(0,0,46,32), new Color(78,1,1,76)};
+
+
         public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
 
         public override void OnNetworkSpawn()
@@ -15,6 +18,17 @@ namespace HelloWorld
                 Move();
             }
         }
+
+        //Metodo que asigna color 
+        public void ColorAsig(){
+            
+        }
+
+        //Metodo que genera color 
+        public void RandomColor(){
+            int randomColor = Random.Range(0, colores.Length);
+        }
+
 
         public void Move()
         {

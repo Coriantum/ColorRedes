@@ -6,7 +6,6 @@ namespace HelloWorld
     public class HelloWorldManager : MonoBehaviour
     {
 
-        public Color[] colores;
 
         void OnGUI()
         {
@@ -47,7 +46,7 @@ namespace HelloWorld
             if (GUILayout.Button(NetworkManager.Singleton.IsServer ? "Move" : "Request Position Change"))
             {
                 var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-                var player = playerObject.GetComponent<HelloWorldPlayer>();
+                var player = playerObject.GetComponent<Player>();
                 player.Move();
             }
         }
