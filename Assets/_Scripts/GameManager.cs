@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace HelloWorld
 {
-    public class HelloWorldManager : MonoBehaviour
+    public class GameManager : MonoBehaviour
     {
 
 

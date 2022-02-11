@@ -20,6 +20,7 @@ namespace HelloWorld
             };
 
 
+        public NetworkVariable<Color> coloresNet = new NetworkVariable<Color>();
         public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
 
         public override void OnNetworkSpawn()
@@ -33,10 +34,7 @@ namespace HelloWorld
         //Metodo que asigna color 
         public void ColorAsig(){
             if(NetworkManager.Singleton.IsServer){
-                int randomColor = Random.Range(0, colores.Length);
-
-                //Vincular color al gameobject
-                colores.SetValue(gameObject,randomColor);
+                GetRandomColor();
             }
             else
             {
@@ -47,7 +45,9 @@ namespace HelloWorld
         //Metodo que genera color aleatorio
         public void GetRandomColor()
         {
-            int randomColor = Random.Range(0, colores.Length);
+            Color randomColor = colores[Random.Range(0, colores.Length)];
+            GetComponent<Renderer>().material.color = randomColor;
+            
         }
         
 
@@ -74,17 +74,26 @@ namespace HelloWorld
 
         [ServerRpc]
         void SubmitColorRequestServerRpc(ServerRpcParams rpcParams = default){
-            //colores.Value = GetRandomColor();
+            GetRandomColor();
         }
+
+        
 
         static Vector3 GetRandomPositionOnPlane()
         {
            return new Vector3(Random.Range(-3f, 3f), 1f, Random.Range(-3f, 3f));
         }
 
+
+        private void Start() {
+            GetRandomColor();
+        }
+
+
         void Update()
         {
             transform.position = Position.Value;
+            
         }
     }
 }
