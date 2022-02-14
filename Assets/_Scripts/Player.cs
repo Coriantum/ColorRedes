@@ -1,26 +1,29 @@
 using Unity.Netcode;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace HelloWorld
 {
     public class Player : NetworkBehaviour
     {
+       
+        private void colors(){
+            
+            coloresNet.Add(Color.black);
+            coloresNet.Add(Color.blue); 
+            coloresNet.Add(Color.cyan); 
+            coloresNet.Add(Color.green); 
+            coloresNet.Add(Color.magenta); 
+            coloresNet.Add(Color.red); 
+            coloresNet.Add(Color.yellow); 
+            coloresNet.Add(Color.gray); 
+            coloresNet.Add(new Color(0,0,46,32)); 
+            coloresNet.Add(new Color(78,1,1,76));
+        }
+        
+        public NetworkList<Color> coloresNet = new NetworkList<Color>();
 
-        public Color[] colores = {
-            Color.black, 
-            Color.blue, 
-            Color.cyan, 
-            Color.green, 
-            Color.magenta, 
-            Color.red, 
-            Color.yellow, 
-            Color.gray, 
-            new Color(0,0,46,32), 
-            new Color(78,1,1,76)
-            };
 
-
-        public NetworkVariable<Color> coloresNet = new NetworkVariable<Color>();
         public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
 
         public override void OnNetworkSpawn()
@@ -28,6 +31,7 @@ namespace HelloWorld
              if (IsOwner)
             {
                 Move();
+                ColorAsig();
             }
         }
 
@@ -45,12 +49,11 @@ namespace HelloWorld
         //Metodo que genera color aleatorio
         public void GetRandomColor()
         {
-            Color randomColor = colores[Random.Range(0, colores.Length)];
+            Color randomColor = coloresNet[Random.Range(0, coloresNet.Count)];
             GetComponent<Renderer>().material.color = randomColor;
             
         }
         
-
 
         public void Move()
         {
@@ -75,6 +78,7 @@ namespace HelloWorld
         [ServerRpc]
         void SubmitColorRequestServerRpc(ServerRpcParams rpcParams = default){
             GetRandomColor();
+            
         }
 
         
