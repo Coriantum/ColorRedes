@@ -6,20 +6,22 @@ namespace HelloWorld
 {
     public class Player : NetworkBehaviour
     {
+        
+        Renderer rend;
        
-        private void colors(){
-            
-            coloresNet.Add(Color.black);
-            coloresNet.Add(Color.blue); 
-            coloresNet.Add(Color.cyan); 
-            coloresNet.Add(Color.green); 
-            coloresNet.Add(Color.magenta); 
-            coloresNet.Add(Color.red); 
-            coloresNet.Add(Color.yellow); 
-            coloresNet.Add(Color.gray); 
-            coloresNet.Add(new Color(0,0,46,32)); 
-            coloresNet.Add(new Color(78,1,1,76));
-        }
+        List<Color> colores = new List<Color>()
+        {
+            Color.black,
+            Color.blue, 
+            Color.cyan, 
+            Color.green, 
+            Color.magenta, 
+            Color.red, 
+            Color.yellow, 
+            Color.gray, 
+            new Color(0,0,46,32),
+            new Color(78,1,1,76)
+        };
         
         public NetworkList<Color> coloresNet = new NetworkList<Color>();
 
@@ -31,14 +33,15 @@ namespace HelloWorld
              if (IsOwner)
             {
                 Move();
-                ColorAsig();
+                rend = GetComponent<Renderer>();
+                GetRandomColor();
             }
         }
 
         //Metodo que asigna color 
         public void ColorAsig(){
             if(NetworkManager.Singleton.IsServer){
-                GetRandomColor();
+                GetRandomColor();                
             }
             else
             {
@@ -49,8 +52,8 @@ namespace HelloWorld
         //Metodo que genera color aleatorio
         public void GetRandomColor()
         {
-            Color randomColor = coloresNet[Random.Range(0, coloresNet.Count)];
-            GetComponent<Renderer>().material.color = randomColor;
+            Color randomColor = colores[Random.Range(0, colores.Count)];
+            rend.material.color = randomColor;
             
         }
         
@@ -76,11 +79,10 @@ namespace HelloWorld
         }
 
         [ServerRpc]
-        void SubmitColorRequestServerRpc(ServerRpcParams rpcParams = default){
-            GetRandomColor();
-            
+        void SubmitColorRequestServerRpc(ServerRpcParams rpcParams = default)
+        {
+            GetRandomColor();    
         }
-
         
 
         static Vector3 GetRandomPositionOnPlane()
@@ -89,15 +91,10 @@ namespace HelloWorld
         }
 
 
-        private void Start() {
-            GetRandomColor();
-        }
-
-
         void Update()
         {
             transform.position = Position.Value;
-            
+            //rend.material.color = coloresNet;
         }
     }
 }
