@@ -8,68 +8,60 @@ namespace HelloWorld
     {
         
         Renderer rend;
-       
-        List<Color> colores = new List<Color>()
-        {
-            Color.black,
-            Color.blue, 
-            Color.cyan, 
-            Color.green, 
-            Color.magenta, 
-            Color.red, 
-            Color.yellow, 
-            Color.gray, 
-            new Color(0,0,46,32),
-            new Color(78,1,1,76)
-        };
+        private bool primeraVez;
         
-        public NetworkList<Color> coloresNet = new NetworkList<Color>();
-
-
+        public static List<Color> coloresNet = new List<Color>();
         public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
+        public NetworkVariable<Color> ColorVariable = new NetworkVariable<Color>();
+
+
+        private void Start() {
+
+            Position.OnValueChanged += OnPositionChange;
+            ColorVariable.OnValueChanged += OnColorChange;
+            rend = GetComponent<Renderer>();
+
+            if(IsServer && IsOwner){
+                coloresNet.Add(Color.black);
+                coloresNet.Add(Color.blue);
+                coloresNet.Add(Color.cyan);
+                coloresNet.Add(Color.magenta);
+                coloresNet.Add(Color.red);
+                coloresNet.Add(Color.yellow);
+                coloresNet.Add(new Color(0,0,46,32));
+                coloresNet.Add(new Color(78,1,1,76));
+            }
+            SubmitColorRequestServerRpc(true);
+            
+        }
+
+        public void OnPositionChange(Vector3 previousValue, Vector3 newValue){
+            transform.position = Position.Value;
+        }
+
+        public void OnColorChange(Color oldColor, Color newColor){
+            rend.material.color = ColorVariable.Value;
+        }
 
         public override void OnNetworkSpawn()
         {
              if (IsOwner)
             {
                 Move();
-                rend = GetComponent<Renderer>();
-                GetRandomColor();
-            }
-        }
-
-        //Metodo que asigna color 
-        public void ColorAsig(){
-            if(NetworkManager.Singleton.IsServer){
-                GetRandomColor();                
-            }
-            else
-            {
-                SubmitColorRequestServerRpc();
+                //GetRandomColor();
             }
         }
 
         //Metodo que genera color aleatorio
         public void GetRandomColor()
         {
-            Color randomColor = colores[Random.Range(0, colores.Count)];
-            rend.material.color = randomColor;
-            
+            SubmitColorRequestServerRpc(false);      
         }
         
 
         public void Move()
-        {
-            if (NetworkManager.Singleton.IsServer)
-            {
-                var randomPosition = GetRandomPositionOnPlane();
-                transform.position = randomPosition;
-                Position.Value = randomPosition;
-            }
-            else
-            {
-                SubmitPositionRequestServerRpc();
-            }
+        {    
+            SubmitPositionRequestServerRpc();
         }
 
         [ServerRpc]
@@ -79,9 +71,17 @@ namespace HelloWorld
         }
 
         [ServerRpc]
-        void SubmitColorRequestServerRpc(ServerRpcParams rpcParams = default)
+        public void SubmitColorRequestServerRpc(bool primeraVez = false, ServerRpcParams rpcParams = default)
         {
-            GetRandomColor();    
+            
+            Color oldColor = ColorVariable.Value; // Color actual del objeto
+            Debug.Log(coloresNet.Count);
+            Color newColor = coloresNet[Random.Range(0, coloresNet.Count)]; // Guarda el siguiente color en la variable 
+            coloresNet.Remove(newColor); // Quita el color de la lista para que no se pueda volver a escoger.Queda guardada en la variable newColor
+            if(! primeraVez){
+                coloresNet.Add(oldColor); // Añade el color que se quitó en la lista
+            }
+            ColorVariable.Value = newColor; // Se asigna el nuevo color
         }
         
 
@@ -93,8 +93,7 @@ namespace HelloWorld
 
         void Update()
         {
-            transform.position = Position.Value;
-            //rend.material.color = coloresNet;
+            
         }
     }
 }
