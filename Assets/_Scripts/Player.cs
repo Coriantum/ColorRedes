@@ -31,7 +31,8 @@ namespace HelloWorld
                 coloresNet.Add(new Color(0,0,46,32));
                 coloresNet.Add(new Color(78,1,1,76));
             }
-            SubmitColorRequestServerRpc(true);
+            
+            
             
         }
 
@@ -48,7 +49,7 @@ namespace HelloWorld
              if (IsOwner)
             {
                 Move();
-                //GetRandomColor();
+                SubmitColorRequestServerRpc(true);
             }
         }
 
