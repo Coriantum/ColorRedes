@@ -32,8 +32,9 @@ namespace HelloWorld
                 coloresNet.Add(new Color(78,1,1,76));
             }
             
-            
-            
+            if(IsOwner){
+                SubmitColorRequestServerRpc(true);
+            }
         }
 
         public void OnPositionChange(Vector3 previousValue, Vector3 newValue){
@@ -41,7 +42,7 @@ namespace HelloWorld
         }
 
         public void OnColorChange(Color oldColor, Color newColor){
-            rend.material.color = ColorVariable.Value;
+            rend.material.color = newColor;
         }
 
         public override void OnNetworkSpawn()
@@ -49,7 +50,6 @@ namespace HelloWorld
              if (IsOwner)
             {
                 Move();
-                SubmitColorRequestServerRpc(true);
             }
         }
 
